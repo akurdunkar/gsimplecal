@@ -208,7 +208,9 @@ void Config::addOption(string var, string val)
             enable_systray = false;
         }
     } else if (var == "systray_icon") {
-        systray_icon = val;
+        if (!val.empty()) {
+            systray_icon = val;
+        }
     }
 }
 

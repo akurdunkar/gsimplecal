@@ -20,7 +20,15 @@ SysTray::SysTray()
     if (g_file_test(config->systray_icon.c_str(), G_FILE_TEST_EXISTS)) {
         tray_icon = gtk_status_icon_new_from_file(config->systray_icon.c_str());
     } else {
-        tray_icon = gtk_status_icon_new_from_icon_name(config->systray_icon.c_str());
+        GtkIconTheme* theme = gtk_icon_theme_get_default();
+        GdkPixbuf* pixbuf = gtk_icon_theme_load_icon(theme,
+            config->systray_icon.c_str(), 24, GTK_ICON_LOOKUP_USE_BUILTIN, NULL);
+        if (pixbuf) {
+            tray_icon = gtk_status_icon_new_from_pixbuf(pixbuf);
+            g_object_unref(pixbuf);
+        } else {
+            tray_icon = gtk_status_icon_new_from_icon_name(config->systray_icon.c_str());
+        }
     }
     gtk_status_icon_set_tooltip_text(tray_icon, "gsimplecal");
     gtk_status_icon_set_visible(tray_icon, TRUE);
