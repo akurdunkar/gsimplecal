@@ -196,7 +196,11 @@ void MainWindow::updateTime()
 
 void MainWindow::close()
 {
-    g_signal_emit_by_name(widget, "destroy");
+    if (Config::getInstance()->enable_systray) {
+        gtk_widget_hide(widget);
+    } else {
+        g_signal_emit_by_name(widget, "destroy");
+    }
 }
 
 void MainWindow::runExternalViewer()

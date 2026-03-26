@@ -32,6 +32,8 @@ public:
     bool close_on_unfocus;
     bool close_on_mouseleave;
     string force_lang;
+    bool enable_systray;
+    string systray_icon;
 
     bool mainwindow_decorated;
     bool mainwindow_keep_above;

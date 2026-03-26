@@ -14,6 +14,8 @@ gsimplecal_SOURCES = \
 	gsimplecal.cpp \
 	MainWindow.cpp \
 	MainWindow.hpp \
+	SysTray.cpp \
+	SysTray.hpp \
 	Timezones.cpp \
 	Timezones.hpp \
 	Unique.cpp \

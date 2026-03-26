@@ -69,6 +69,8 @@ void Config::setDefaults()
     show_week_numbers = false;
     close_on_unfocus = false;
     close_on_mouseleave = false;
+    enable_systray = false;
+    systray_icon = string("x-office-calendar");
 }
 
 bool Config::findPath()
@@ -201,6 +203,12 @@ void Config::addOption(string var, string val)
         }
     } else if (var == "force_lang") {
         force_lang = val;
+    } else if (var == "enable_systray") {
+        if (!fromString<bool>(enable_systray, val)) {
+            enable_systray = false;
+        }
+    } else if (var == "systray_icon") {
+        systray_icon = val;
     }
 }
 

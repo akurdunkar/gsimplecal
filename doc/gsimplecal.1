@@ -157,6 +157,17 @@ focus upon creation
 Sets whether the calendar will close if the mouse pointer leaves the window.
 
 .TP 5
+\fBenable_systray\fP: 1 or 0, defaults to 0.
+When enabled, gsimplecal runs as a system tray icon. Left\-clicking the tray
+icon toggles the calendar window. Right\-clicking shows a menu to quit the
+application. The process stays running even when the calendar is hidden.
+
+.TP 5
+\fBsystray_icon\fP: string, defaults to "x\-office\-calendar".
+Sets the icon displayed in the system tray. Can be a freedesktop.org icon name
+(e.g. "x\-office\-calendar") or an absolute path to an image file.
+
+.TP 5
 \fBexternal_viewer\fP: string, defaults to empty string.
 Command line to run when doubleclicking a date. This string is strftime'd
 (see \fIman strftime\fP for the possible substitutions)

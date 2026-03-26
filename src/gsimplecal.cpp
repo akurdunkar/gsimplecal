@@ -9,9 +9,11 @@
 #include "MainWindow.hpp"
 #include "Config.hpp"
 #include "Unique.hpp"
+#include "SysTray.hpp"
 
 
 MainWindow* main_window;
+SysTray* sys_tray = NULL;
 
 
 static void signal_handler(int signal_id)
@@ -19,9 +21,11 @@ static void signal_handler(int signal_id)
     if (signal_id == SIGTERM) {
         gtk_main_quit();
     } else if (signal_id == SIGUSR1) {
-        main_window->nextMonth();
+        MainWindow* w = sys_tray ? sys_tray->getWindow() : main_window;
+        if (w) w->nextMonth();
     } else if (signal_id == SIGUSR2) {
-        main_window->prevMonth();
+        MainWindow* w = sys_tray ? sys_tray->getWindow() : main_window;
+        if (w) w->prevMonth();
     }
 }
 
@@ -115,31 +119,40 @@ int main(int argc, char *argv[])
     }
 
     gtk_init(&argc, &argv);
-    main_window = new MainWindow();
 
-    g_signal_connect(main_window->getWindow(), "destroy",
-                     GCallback(destroy), NULL);
+    if (config->enable_systray) {
+        // Systray mode: tray icon persists, window toggled on click
+        sys_tray = new SysTray();
+        gtk_main();
+        delete sys_tray;
+        sys_tray = NULL;
+    } else {
+        // Legacy mode: window-based toggle
+        main_window = new MainWindow();
 
-    if (config->show_timezones) {
-        // Only update as often if seconds are rendered.
-        unsigned int interval = 1000;  // msec
-        if (config->clock_format.find("%S") == std::string::npos) {
-            interval = 30 * 1000;
+        g_signal_connect(main_window->getWindow(), "destroy",
+                         GCallback(destroy), NULL);
+
+        if (config->show_timezones) {
+            unsigned int interval = 1000;  // msec
+            if (config->clock_format.find("%S") == std::string::npos) {
+                interval = 30 * 1000;
+            }
+            g_timeout_add(interval, (GSourceFunc)time_handler, NULL);
         }
-        g_timeout_add(interval, (GSourceFunc)time_handler, NULL);
-    }
-    if (config->close_on_unfocus) {
-        g_signal_connect(main_window->getWindow(), "focus-out-event",
-                         GCallback(gtk_widget_destroy),
-                         main_window->getWindow());
-    }
-    if (config->close_on_mouseleave) {
-        g_signal_connect(main_window->getWindow(), "leave-notify-event",
-                         GCallback(on_mouse_leave),
-                         main_window->getWindow());
-    }
+        if (config->close_on_unfocus) {
+            g_signal_connect(main_window->getWindow(), "focus-out-event",
+                             GCallback(gtk_widget_destroy),
+                             main_window->getWindow());
+        }
+        if (config->close_on_mouseleave) {
+            g_signal_connect(main_window->getWindow(), "leave-notify-event",
+                             GCallback(on_mouse_leave),
+                             main_window->getWindow());
+        }
 
-    gtk_main();
+        gtk_main();
+    }
 
     unique->stop();
     return 0;
